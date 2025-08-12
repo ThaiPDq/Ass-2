@@ -65,8 +65,65 @@ void Rope::update(Rope::Node *node) {
     else node->balance = Node::RH; 
 }
 
-Rope::Node *Rope::rotateLeft(Rope::Node *x) {
+//helper max
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+Rope::Node *Rope::rotateLeft(Rope::Node *x) 
+{
+    Node *y = x->right;
+    Node *T2 = y->left;
+
+    y->left = x;
+    x->right = T2;
+
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+
+    return y;
+}
+
+Rope::Node * Rope::rotateRight(Rope::Node *y) {
+    Node *x = y->left;
+    Node *t2 = x->right;
+
+    x->right = y;
+    y->left = t2;
+
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+
+Rope::Node * Rope::rebalance(Rope::Node *node) {
+    if (node == nullptr) return node;
+
+    node->height = max(height(node->left), height(node->right));
     
+    //left heavy
+    if (node->balance > 1) {
+        if (height(node->left->left) >= height(node->left->right)) {
+            return rotateRight(node); //ll
+        }
+        else {
+            //lr
+            node->left = rotateLeft(node->left);
+            return rotateRight(node);
+        }
+    }
+    //right
+    else if (node->balance < -1) {
+        if (height(node->right->right) >= height(node->right->left)) {
+            return rotateLeft(node);
+        }
+        else {
+            node->right = rotateRight(node->right);
+            return rotateLeft(node);
+        }
+    }
+    return node;
 }
 // ==================== PUBLIC INTERFACE ====================
 
