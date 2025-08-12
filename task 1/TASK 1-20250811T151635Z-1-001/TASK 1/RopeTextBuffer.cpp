@@ -138,6 +138,44 @@ Rope::Node *Rope::concatNodes(Rope::Node *left, Rope::Node *right) {
     return rebalance(node);
 }
 
+char Rope::charAt(Rope::Node *node, int index) const {
+    if (!node) return;
+    
+    if (node->isLeaf()) {
+        if (index < 0 || node->data.size()) return;
+
+        return node->data[index - 1];
+    }
+
+    if (index < node->weight) {
+        return charAt(node->left, index);
+    }
+    else {
+        return charAt(node->right, index - node->weight);
+    }
+}
+
+std::string Rope::toString(Rope::Node *node) const {
+    if (!node) return;
+
+    if (node->isLeaf()) return node->data;
+
+    string leftStr = toString(node->left);
+    string rStr = toString(node->right);
+
+    return leftStr + rStr;
+}
+
+void Rope::destroy(Rope::Node *&node) {
+    if (!node) return;
+
+    destroy(node->left);
+    destroy(node->right);
+
+    delete node;
+    node = nullptr;
+}
+
 // ==================== PUBLIC INTERFACE ====================
 
 int Rope::length() const
