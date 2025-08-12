@@ -139,7 +139,7 @@ Rope::Node *Rope::concatNodes(Rope::Node *left, Rope::Node *right) {
 }
 
 char Rope::charAt(Rope::Node *node, int index) const {
-    if (!node) return;
+    if (!node) return NULL;
     
     if (node->isLeaf()) {
         if (index < 0 || node->data.size()) return;
@@ -182,5 +182,15 @@ int Rope::length() const
 {
     return getTotalLength(root);
 }
+
+bool Rope::empty() const {
+    return root == nullptr;
+}
+
+char Rope::charAt(int index) const {
+    return this->charAt(root, index);
+}
+
+
 
 // Todo
