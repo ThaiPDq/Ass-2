@@ -3,7 +3,7 @@
 // ----------------- DoublyLinkedList -----------------
 
 template <typename T>
-void DoublyLinkedList<T>::insertAtHead(const T& data) {
+void DoublyLinkedList<T>::insertAtHead(T data) {
     Node* newNode = new Node(data, nullptr, head);
     if (head != nullptr) {
         head->prev = newNode;
@@ -15,7 +15,7 @@ void DoublyLinkedList<T>::insertAtHead(const T& data) {
 }
 
 template <typename T>
-void DoublyLinkedList<T>::insertAtTail(const T& data) {
+void DoublyLinkedList<T>::insertAtTail(T data) {
     Node* newNode = new Node(data, tail, nullptr);
     if (tail != nullptr) {
         tail->next = newNode;
@@ -27,7 +27,7 @@ void DoublyLinkedList<T>::insertAtTail(const T& data) {
 }
 
 template <typename T>
-void DoublyLinkedList<T>::insertAt(int index, const T& data) {
+void DoublyLinkedList<T>::insertAt(int index, T data) {
     if (index < 0 || index > count) {
         throw std::out_of_range("Index is invalid!");
     }
@@ -65,7 +65,7 @@ void DoublyLinkedList<T>::deleteAt(int index) {
 
 // non-const get (mutable)
 template <typename T>
-T& DoublyLinkedList<T>::get(int index) {
+T &DoublyLinkedList<T>::get(int index) const {
     if (index < 0 || index >= count) throw std::out_of_range("Index is invalid!");
     Node* current = head;
     for (int i = 0; i < index; ++i) current = current->next;
@@ -74,7 +74,7 @@ T& DoublyLinkedList<T>::get(int index) {
 
 // const-get
 template <typename T>
-const T& DoublyLinkedList<T>::get(int index) const {
+T &DoublyLinkedList<T>::get(int index) const {
     if (index < 0 || index >= count) throw std::out_of_range("Index is invalid!");
     Node* current = head;
     for (int i = 0; i < index; ++i) current = current->next;
@@ -82,7 +82,7 @@ const T& DoublyLinkedList<T>::get(int index) const {
 }
 
 template <typename T>
-int DoublyLinkedList<T>::indexOf(const T& item) const {
+int DoublyLinkedList<T>::indexOf(T item) const {
     Node* current = head;
     int index = 0;
     while (current) {
@@ -93,7 +93,7 @@ int DoublyLinkedList<T>::indexOf(const T& item) const {
 }
 
 template <typename T>
-bool DoublyLinkedList<T>::contains(const T& item) const {
+bool DoublyLinkedList<T>::contains(T item) const {
     return indexOf(item) != -1;
 }
 
@@ -115,7 +115,7 @@ void DoublyLinkedList<T>::reverse() {
 
 // convert2str now takes const T& and can be nullptr
 template <typename T>
-string DoublyLinkedList<T>::toString(string (*convert2str)(const T&) /* = nullptr */) const {
+std::string DoublyLinkedList<T>::toString(std::string (*convert2str)(T &) = nullptr) const {
     string result = "[";
     Node* current = head;
     bool first = true;
