@@ -125,6 +125,19 @@ Rope::Node * Rope::rebalance(Rope::Node *node) {
     }
     return node;
 }
+
+Rope::Node *Rope::concatNodes(Rope::Node *left, Rope::Node *right) {
+    Node* node = new Node("");
+
+    node->left = left;
+    node->right = right;
+
+    node->weight = getTotalLength(left);
+    node->height = max(height(left), height(right)) + 1 ;
+
+    return rebalance(node);
+}
+
 // ==================== PUBLIC INTERFACE ====================
 
 int Rope::length() const
