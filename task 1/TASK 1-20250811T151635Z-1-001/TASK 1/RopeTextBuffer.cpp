@@ -176,6 +176,52 @@ void Rope::destroy(Rope::Node *&node) {
     node = nullptr;
 }
 
+void Rope::split(Node* node, int index, Node*& outLeft, Node*& outRight) {
+    if (!node) {
+        outLeft = nullptr;
+        outRight = nullptr;
+        return;
+    }
+
+    if (!node->left && !node->right) {
+        if (index <= 0) {
+            outLeft = nullptr;
+            outRight = new Node(node->data);
+        }
+        else if (index >= node->data.size()) {
+            outLeft = new Node(node->data);
+            outRight = nullptr;
+        }
+        else {
+            std::string leftStr = node->data.substr(0, index);
+            std::string rightStr = node->data.substr(index);
+            outLeft = leftStr.empty() ? nullptr : new Node(leftStr);
+            outRight = rightStr.empty() ? nullptr : new Node(rightStr);
+        }
+        return;
+    }
+    if (index < node->weight) {
+        Node* leftPart = nullptr;
+        Node* rightPart = nullptr;
+        split(node->left, index, leftPart, rightPart);
+        outLeft = leftPart;
+        outRight = concatNodes(rightPart, node->right);
+    }
+    else if (index > node->weight) {
+        Node* leftPart = nullptr;
+        Node* rightPart = nullptr;
+        split(node->right, index - node->weight, leftPart, rightPart);
+        outLeft = concatNodes(node->left, leftPart);
+        outRight = rightPart;
+    }
+    else {
+        outLeft = node->left;
+        outRight = node->right;
+    }
+
+
+}
+
 // ==================== PUBLIC INTERFACE ====================
 
 int Rope::length() const
