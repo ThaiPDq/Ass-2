@@ -70,6 +70,11 @@ int max(int a, int b) {
     return (a > b) ? a : b;
 }
 
+//helper min
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
 Rope::Node *Rope::rotateLeft(Rope::Node *x) 
 {
     Node *y = x->right;
@@ -139,10 +144,10 @@ Rope::Node *Rope::concatNodes(Rope::Node *left, Rope::Node *right) {
 }
 
 char Rope::charAt(Rope::Node *node, int index) const {
-    if (!node) return NULL;
+    if (!node) return '\0';
     
     if (node->isLeaf()) {
-        if (index < 0 || node->data.size()) return;
+        if (index < 0 || node->data.size()) return '\0';
 
         return node->data[index - 1];
     }
@@ -156,7 +161,7 @@ char Rope::charAt(Rope::Node *node, int index) const {
 }
 
 std::string Rope::toString(Rope::Node *node) const {
-    if (!node) return;
+    if (!node) return NULL;
 
     if (node->isLeaf()) return node->data;
 
@@ -237,6 +242,45 @@ char Rope::charAt(int index) const {
     return this->charAt(root, index);
 }
 
+std::string Rope::substringHelper(Rope::Node *node, int start, int end) const {
+    if (!node || start>end) return "";
 
+    if (node->isLeaf()) {
+        int leafLeng = node->data.size();
+        int starto = max(0, start);
+        int endo = min(leafLeng - 1, end);
+        if (starto > endo) return "";
+        return node->data.substr(starto, endo + 1 - starto);
+    }
+
+    if (end < node->weight) {
+        return substringHelper (node->left, start, end);
+    }
+    else if (start >= node->weight) {
+        return substringHelper (node->right, start - node->weight, end - node->weight);
+    }
+    else {
+        string lefty = substringHelper(node->left, start, node->weight - 1);
+        string righty = substringHelper(node->right, 0, end - node->weight);
+        return lefty+righty;
+    }
+}
+
+std::string Rope::substring(int start, int length) const {
+    return substringHelper(root, start, start+length - 1);
+}
+
+void Rope::insert(int index, const std::string &s) {
+
+}
+
+void Rope::deleteRange(int start, int length) {
+
+}
+
+std::string Rope::toString() const {
+    string result = toString(root);
+    return result;
+}
 
 // Todo

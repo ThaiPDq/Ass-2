@@ -27,12 +27,19 @@ void TestHelper::test_public_Basic()
     Rope *test = TestHelper::createRope(root);
 
     EXPECT_EQ(test->toString(), "Hello_my_name_is_DSA");
+    cout<<"1";
     EXPECT_EQ(test->length(), 20);
+    cout<<"2";
     EXPECT_EQ(test->empty(), false);
+    cout<<"3";
     EXPECT_EQ(test->charAt(0), 'H');
+    cout<<"4";
     EXPECT_EQ(test->charAt(19), 'A');
+    cout<<"5";
     EXPECT_EQ(test->charAt(10), 'a');
+    cout<<"6";
     EXPECT_EQ(test->substring(7, 11), "y_name_is_D");
+    cout<<"7";
     delete test;
 }
 
