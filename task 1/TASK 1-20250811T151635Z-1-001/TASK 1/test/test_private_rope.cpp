@@ -25,29 +25,29 @@ void TestHelper::test_private_Basic()
     );
 
     Rope test;
-    EXPECT_EQ(test.height(root), 4);
-    EXPECT_EQ(test.height(root->left->left), 1);
-    EXPECT_EQ(test.height(root->right->left), 2);
+    EXPECT_EQ(test.height(root), 4); cout<<"1";
+    EXPECT_EQ(test.height(root->left->left), 1); cout<<"2";
+    EXPECT_EQ(test.height(root->right->left), 2); cout<<"3";
 
-    EXPECT_EQ(test.getTotalLength(root), 20);
-    EXPECT_EQ(test.getTotalLength(root->right), 11);
+    EXPECT_EQ(test.getTotalLength(root), 20); cout<<"4";
+    EXPECT_EQ(test.getTotalLength(root->right), 11); cout<<"51";
 
-    EXPECT_EQ(test.charAt(root, 0), 'H');
-    EXPECT_EQ(test.charAt(root, 19), 'A');
-    EXPECT_EQ(test.charAt(root, 10), 'a');
+    EXPECT_EQ(test.charAt(root, 0), 'H'); cout<<"6";
+    EXPECT_EQ(test.charAt(root, 19), 'A'); cout<<"7";
+    EXPECT_EQ(test.charAt(root, 10), 'a'); cout<<"8";
 
-    EXPECT_EQ(test.toString(root), "Hello_my_name_is_DSA");
+    EXPECT_EQ(test.toString(root), "Hello_my_name_is_DSA"); cout<<"9";
 
     root->balance = Rope::Node::BalanceFactor::EH;
     root->height = 0;
     root->weight = 0;
     test.update(root);
-    EXPECT_EQ(root->balance, Rope::Node::BalanceFactor::RH);
-    EXPECT_EQ(root->height, 4);
-    EXPECT_EQ(root->weight, 9);
+    EXPECT_EQ(root->balance, Rope::Node::BalanceFactor::RH); cout<<"10";
+    EXPECT_EQ(root->height, 4); cout<<"11";
+    EXPECT_EQ(root->weight, 9); cout<<"12";
 
     test.destroy(root);
-    EXPECT_EQ(test.toString(root), "");
+    EXPECT_EQ(test.toString(root), ""); cout<<"13";
 }
 
 void TestHelper::test_private_rotateLeft()
@@ -68,7 +68,7 @@ void TestHelper::test_private_rotateLeft()
         createInternalNode(createLeafNode("B"), createLeafNode("C"), 1, 2, Rope::Node::EH),
         1, 3, Rope::Node::RH);
 
-    EXPECT_EQ(nodeToString(actual), nodeToString(expected));
+    EXPECT_EQ(nodeToString(actual), nodeToString(expected)); cout<<"14";
     rope.destroy(expected);
     rope.destroy(actual);
 }
