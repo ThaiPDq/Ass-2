@@ -85,7 +85,7 @@ Rope::Node *Rope::rotateLeft(Rope::Node *x)
 
     x->height = max(height(x->left), height(x->right)) + 1;
     y->height = max(height(y->left), height(y->right)) + 1;
-
+    update(x); update(y);
     return y;
 }
 
@@ -98,34 +98,34 @@ Rope::Node * Rope::rotateRight(Rope::Node *y) {
 
     y->height = max(height(y->left), height(y->right)) + 1;
     x->height = max(height(x->left), height(x->right)) + 1;
-
+    update(y); update(x);
     return x;
 }
 
 Rope::Node * Rope::rebalance(Rope::Node *node) {
     if (node == nullptr) return node;
 
-    node->height = max(height(node->left), height(node->right));
+    node->height = max(height(node->left), height(node->right)) + 1;
     
     //left heavy
-    if (node->balance > 1) {
+    if (node->balance == 1) {
         if (height(node->left->left) >= height(node->left->right)) {
             return rotateRight(node); //ll
         }
         else {
             //lr
             node->left = rotateLeft(node->left);
-            return rotateRight(node);
+            return rotateRight(node); 
         }
     }
     //right
-    else if (node->balance < -1) {
+    else if (node->balance == -1) {
         if (height(node->right->right) >= height(node->right->left)) {
-            return rotateLeft(node);
+            return rotateLeft(node); 
         }
         else {
             node->right = rotateRight(node->right);
-            return rotateLeft(node);
+            return rotateLeft(node); 
         }
     }
     return node;
@@ -147,9 +147,9 @@ char Rope::charAt(Rope::Node *node, int index) const {
     if (!node) return '\0';
     
     if (node->isLeaf()) {
-        if (index < 0 || node->data.size()) return '\0';
+        if (index <0 ||index > node->data.size()) return '\0';
 
-        return node->data[index - 1];
+        return node->data[index];
     }
 
     if (index < node->weight) {
@@ -161,7 +161,7 @@ char Rope::charAt(Rope::Node *node, int index) const {
 }
 
 std::string Rope::toString(Rope::Node *node) const {
-    if (!node) return NULL;
+    if (!node) return "";
 
     if (node->isLeaf()) return node->data;
 
@@ -275,7 +275,7 @@ void Rope::insert(int index, const std::string &s) {
 }
 
 void Rope::deleteRange(int start, int length) {
-
+    
 }
 
 std::string Rope::toString() const {
