@@ -105,10 +105,12 @@ Rope::Node * Rope::rotateRight(Rope::Node *y) {
 Rope::Node * Rope::rebalance(Rope::Node *node) {
     if (node == nullptr) return node;
 
-    node->height = max(height(node->left), height(node->right));
+    node->height = max(height(node->left), height(node->right)) + 1;
+
+    int balance = height(node->left) - height(node->right);
     
     //left heavy
-    if (node->balance > 1) {
+    if (balance > 1) {
         if (height(node->left->left) >= height(node->left->right)) {
             return rotateRight(node); //ll
         }
@@ -119,7 +121,7 @@ Rope::Node * Rope::rebalance(Rope::Node *node) {
         }
     }
     //right
-    else if (node->balance < -1) {
+    else if (balance < -1) {
         if (height(node->right->right) >= height(node->right->left)) {
             return rotateLeft(node);
         }
@@ -211,6 +213,7 @@ void Rope::split(Node* node, int index, Node*& outLeft, Node*& outRight) {
         split(node->left, index, leftPart, rightPart);
         outLeft = leftPart;
         outRight = concatNodes(rightPart, node->right);
+        update(outRight);
     }
     else if (index > node->weight) {
         Node* leftPart = nullptr;
@@ -218,13 +221,12 @@ void Rope::split(Node* node, int index, Node*& outLeft, Node*& outRight) {
         split(node->right, index - node->weight, leftPart, rightPart);
         outLeft = concatNodes(node->left, leftPart);
         outRight = rightPart;
+        update(outLeft);
     }
     else {
         outLeft = node->left;
         outRight = node->right;
     }
-
-
 }
 
 // ==================== PUBLIC INTERFACE ====================
@@ -271,11 +273,52 @@ std::string Rope::substring(int start, int length) const {
 }
 
 void Rope::insert(int index, const std::string &s) {
+    if (index < 0 || index > length()) {
+        throw std::out_of_range("Index is invalid!");
+    }
 
+    if (s.empty()) return;
+
+    if (!root) {
+        int len = s.size();
+        // First chunk becomes root
+        root = new Node(s.substr(0, CHUNK_SIZE));
+
+        // Remaining chunks concatenated
+        int start = CHUNK_SIZE;
+        while (start < s.size()) {
+            int chunkSize = (len - start > CHUNK_SIZE) ? CHUNK_SIZE : (len - start);
+            Node* newNode = new Node(s.substr(start, chunkSize));
+            root = concatNodes(root, newNode); // concatNodes should handle balancing if needed
+            start += chunkSize;
+        }
+        return;
+    }
+
+    Node* left = nullptr;
+    Node* right = nullptr;
+
+    split(root, index, left, right);
+
+    Node* middle = new Node(s);
+
+    Node* temp = concatNodes(left, middle);
+
+    root = concatNodes(temp, right);
 }
 
 void Rope::deleteRange(int start, int length) {
+    Node* s1 = nullptr;
+    Node* s2 = nullptr;
 
+    split(root, start, s1, s2);
+
+    Node* s3 = nullptr;
+    Node* s4 = nullptr;
+    split(s2, length, s3, s4);
+
+    root = concatNodes(s1, s4);
+    destroy(s3);
 }
 
 std::string Rope::toString() const {
