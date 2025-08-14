@@ -30,25 +30,25 @@ void TestHelper::test_rope_text_buffer_move()
 {
     RopeTextBuffer buffer;
     buffer.insert("Hello_my_name_is_DSA");
-    EXPECT_EQ(buffer.getContent(), "Hello_my_name_is_DSA");
-    EXPECT_EQ(buffer.getCursorPos(), 20);
+    EXPECT_EQ(buffer.getContent(), "Hello_my_name_is_DSA"); cout<<"1";
+    EXPECT_EQ(buffer.getCursorPos(), 20); cout<<"2";
     try
     {
         buffer.moveCursorRight();
     }
     catch (const cursor_error &e)
     {
-        EXPECT_EQ(std::string(e.what()), "Cursor error!");
+        EXPECT_EQ(std::string(e.what()), "Cursor error!"); cout<<"3";
     }
     buffer.moveCursorTo(0);
-    EXPECT_EQ(buffer.getCursorPos(), 0);
+    EXPECT_EQ(buffer.getCursorPos(), 0); cout<<"4";
     try
     {
         buffer.moveCursorLeft();
     }
     catch (const cursor_error &e)
     {
-        EXPECT_EQ(std::string(e.what()), "Cursor error!");
+        EXPECT_EQ(std::string(e.what()), "Cursor error!"); cout <<"5";
     }
 
     buffer.moveCursorRight();
@@ -56,11 +56,11 @@ void TestHelper::test_rope_text_buffer_move()
     buffer.moveCursorRight();
     buffer.moveCursorRight();
     buffer.moveCursorRight();
-    EXPECT_EQ(buffer.getCursorPos(), 5);
+    EXPECT_EQ(buffer.getCursorPos(), 5); cout<<"6";
     buffer.moveCursorLeft();
     buffer.moveCursorLeft();
     buffer.moveCursorLeft();
-    EXPECT_EQ(buffer.getCursorPos(), 2);
+    EXPECT_EQ(buffer.getCursorPos(), 2); cout<<"7";
 
     try
     {
@@ -68,7 +68,7 @@ void TestHelper::test_rope_text_buffer_move()
     }
     catch (const out_of_range &e)
     {
-        EXPECT_EQ(std::string(e.what()), "Index is invalid!");
+        EXPECT_EQ(std::string(e.what()), "Index is invalid!"); cout<<"8";
     }
     EXPECT_EQ(buffer.getCursorPos(), 2);
     buffer.moveCursorTo(10);

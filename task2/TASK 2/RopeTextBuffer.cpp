@@ -13,6 +13,20 @@ DoublyLinkedList<T>::DoublyLinkedList() : length(0)
     head->next = tail;
     tail->prev = head;
 }
+
+template <typename T>
+DoublyLinkedList<T>::~DoublyLinkedList() {
+    Node* current = head;
+    while (current) {
+        Node* nextNode = current->next;
+        delete current;
+        current = nextNode;
+    }
+    head = nullptr;
+    tail = nullptr;
+    length = 0;
+}
+
 // TODO BTL1
 
 template <typename T>
@@ -24,7 +38,7 @@ void DoublyLinkedList<T>::insertAtHead(T data) {
         tail = newNode;
     }
     head = newNode;
-    count++;
+    length++;
 }
 
 template <typename T>
@@ -36,19 +50,19 @@ void DoublyLinkedList<T>::insertAtTail(T data) {
         head = newNode;
     }
     tail = newNode;
-    count++;
+    length++;
 }
 
 template <typename T>
 void DoublyLinkedList<T>::insertAt(int index, T data) {
-    if (index < 0 || index > count) {
+    if (index < 0 || index > length) {
         throw std::out_of_range("Index is invalid!");
     }
     if (index == 0) {
         insertAtHead(data);
         return;
     }
-    if (index == count) {
+    if (index == length) {
         insertAtTail(data);
         return;
     }
@@ -58,12 +72,12 @@ void DoublyLinkedList<T>::insertAt(int index, T data) {
     Node* newNode = new Node(data, current->prev, current);
     if (current->prev) current->prev->next = newNode;
     current->prev = newNode;
-    count++;
+    length++;
 }
 
 template <typename T>
 void DoublyLinkedList<T>::deleteAt(int index) {
-    if (index < 0 || index >= count) {
+    if (index < 0 || index >= length) {
         throw std::out_of_range("Index is invalid!");
     }
     Node* toDelete = head;
@@ -73,22 +87,13 @@ void DoublyLinkedList<T>::deleteAt(int index) {
     if (toDelete->next) toDelete->next->prev = toDelete->prev;
     else tail = toDelete->prev;
     delete toDelete;
-    count--;
-}
-
-// non-const get (mutable)
-template <typename T>
-T &DoublyLinkedList<T>::get(int index) const {
-    if (index < 0 || index >= count) throw std::out_of_range("Index is invalid!");
-    Node* current = head;
-    for (int i = 0; i < index; ++i) current = current->next;
-    return current->data;
+    length--;
 }
 
 // const-get
 template <typename T>
 T &DoublyLinkedList<T>::get(int index) const {
-    if (index < 0 || index >= count) throw std::out_of_range("Index is invalid!");
+    if (index < 0 || index >= length) throw std::out_of_range("Index is invalid!");
     Node* current = head;
     for (int i = 0; i < index; ++i) current = current->next;
     return current->data;
@@ -111,7 +116,7 @@ bool DoublyLinkedList<T>::contains(T item) const {
 }
 
 template <typename T>
-int DoublyLinkedList<T>::size() const { return count; }
+int DoublyLinkedList<T>::size() const { return length; }
 
 template <typename T>
 void DoublyLinkedList<T>::reverse() {
@@ -127,8 +132,7 @@ void DoublyLinkedList<T>::reverse() {
 }
 
 // convert2str now takes const T& and can be nullptr
-template <typename T>
-std::string DoublyLinkedList<T>::toString(std::string (*convert2str)(T &) = nullptr) const {
+template<class T> std::string DoublyLinkedList<T>::toString(std::string (*convert2str)(T &)) const {
     string result = "[";
     Node* current = head;
     bool first = true;
@@ -506,12 +510,12 @@ void RopeTextBuffer::insert(const string &s)
 void RopeTextBuffer::deleteRange(int length)
 {
     // TODO TASK 2
-    if (length < 0) throw std::out_of_range("Index is invalid!");
+    if (length < 0) throw std::out_of_range("Length is invalid!");
     if (length == 0) return;
 
     // kiểm tra vượt quá độ dài
     if (cursorPos + length > rope.length())
-        throw std::out_of_range("Index is invalid!");
+        throw std::out_of_range("Length is invalid!");
 
     // lưu lại phần sẽ xóa
     string removed = rope.substring(cursorPos, length);
@@ -531,9 +535,9 @@ void RopeTextBuffer::deleteRange(int length)
 void RopeTextBuffer::replace(int length, const string &s)
 {
     // TODO TASK 2
-    if (length < 0) throw std::out_of_range("Index is invalid!");
+    if (length < 0) throw std::out_of_range("Length is invalid!");
     if (cursorPos + length > rope.length())
-        throw std::out_of_range("Index is invalid!");
+        throw std::out_of_range("Length is invalid!");
 
     int before = cursorPos;
 
@@ -576,7 +580,7 @@ void RopeTextBuffer::moveCursorLeft()
 {
     // TODO TASK 2
     if (cursorPos <= 0)
-        throw std::out_of_range("Cursor is out of range!");
+        throw  cursor_error();
 
     int before = cursorPos;
     cursorPos--;
@@ -593,7 +597,7 @@ void RopeTextBuffer::moveCursorRight()
 {
     // TODO TASK 2
     if (cursorPos >= rope.length())
-        throw std::out_of_range("Cursor is out of range!");
+        throw cursor_error();
 
     int before = cursorPos;
     cursorPos++;
@@ -670,6 +674,14 @@ void RopeTextBuffer::clear()
 
 // ==================== HistoryManager ====================
 
+HistoryManager::HistoryManager() {}
+
+HistoryManager::~HistoryManager() {}
+
+void HistoryManager::addAction(const HistoryManager::Action &a) {}
+
+
+
 bool HistoryManager::canUndo() const
 {
     // TODO TASK 2
@@ -699,4 +711,8 @@ void HistoryManager::printHistory() const
     }
     cout << "]" << endl;
 }
+
+void RopeTextBuffer::undo() {}
+
+void RopeTextBuffer::redo() {}
 

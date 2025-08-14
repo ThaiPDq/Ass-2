@@ -165,7 +165,7 @@ public:
 
     // TODO: may provide some attributes
     DoublyLinkedList<Action> actions;
-    int currentIndex;
+    Action *current;
 
 public:
     HistoryManager();

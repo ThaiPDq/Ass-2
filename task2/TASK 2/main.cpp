@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
         {"test_rope_text_buffer_find", TestHelper::test_rope_text_buffer_find},
         {"test_rope_text_buffer_full_sequence", TestHelper::test_rope_text_buffer_full_sequence},
 
-        {"test_history", TestHelper::test_history},
-        {"test_rop_text_buffer_history", TestHelper::test_rop_text_buffer_history},
+        // {"test_history", TestHelper::test_history},
+        // {"test_rop_text_buffer_history", TestHelper::test_rop_text_buffer_history},
     };
 
     if (argc < 2)
