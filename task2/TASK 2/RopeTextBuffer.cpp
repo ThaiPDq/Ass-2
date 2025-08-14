@@ -474,120 +474,229 @@ RopeTextBuffer::RopeTextBuffer()
     : cursorPos(0), rope(), history(nullptr) 
 {
     // TODO TASK 2
+    history = new HistoryManager();
 }
 
 RopeTextBuffer::~RopeTextBuffer()
 {
     //TODO TASK 2
+    delete history;
+    history = nullptr;
 }
 
 void RopeTextBuffer::insert(const string &s)
 {
     // TODO TASK 2
+    if (s.empty()) return;
+
+    int before = cursorPos;
+    // chèn vào ngay trước vị trí con trỏ hiện tại
+    rope.insert(cursorPos, s);
+    cursorPos += static_cast<int>(s.size());
+
+    // ghi history
+    HistoryManager::Action a;
+    a.actionName = "insert";
+    a.cursorBefore = before;
+    a.cursorAfter  = cursorPos;
+    a.data = s;
+    history->addAction(a);
 }
 
 void RopeTextBuffer::deleteRange(int length)
 {
     // TODO TASK 2
+    if (length < 0) throw std::out_of_range("Index is invalid!");
+    if (length == 0) return;
+
+    // kiểm tra vượt quá độ dài
+    if (cursorPos + length > rope.length())
+        throw std::out_of_range("Index is invalid!");
+
+    // lưu lại phần sẽ xóa
+    string removed = rope.substring(cursorPos, length);
+
+    // xóa bắt đầu từ vị trí con trỏ
+    rope.deleteRange(cursorPos, length);
+
+    // con trỏ giữ nguyên
+    HistoryManager::Action a;
+    a.actionName = "delete";
+    a.cursorBefore = cursorPos;
+    a.cursorAfter  = cursorPos;
+    a.data = removed;
+    history->addAction(a);
 }
 
 void RopeTextBuffer::replace(int length, const string &s)
 {
     // TODO TASK 2
+    if (length < 0) throw std::out_of_range("Index is invalid!");
+    if (cursorPos + length > rope.length())
+        throw std::out_of_range("Index is invalid!");
+
+    int before = cursorPos;
+
+    // lấy chuỗi cũ để lưu history
+    string oldStr = (length > 0) ? rope.substring(cursorPos, length) : string();
+
+    // thay thế = xóa length rồi chèn s
+    if (length > 0) rope.deleteRange(cursorPos, length);
+    if (!s.empty()) {
+        rope.insert(cursorPos, s);
+        cursorPos += static_cast<int>(s.size());
+    }
+
+    HistoryManager::Action a;
+    a.actionName = "replace";
+    a.cursorBefore = before;
+    a.cursorAfter  = cursorPos; // sau khi chèn xong, con trỏ ở cuối chuỗi mới
+    a.data = oldStr;            // lưu chuỗi cũ để phục hồi khi undo
+    history->addAction(a);
 }
 
 void RopeTextBuffer::moveCursorTo(int index)
 {
     // TODO TASK 2
+    if (index < 0 || index > rope.length())
+        throw std::out_of_range("Index is invalid!");
+
+    int before = cursorPos;
+    cursorPos = index;
+
+    HistoryManager::Action a;
+    a.actionName = "move";
+    a.cursorBefore = before;
+    a.cursorAfter  = cursorPos;
+    a.data = "J"; // Jump
+    history->addAction(a);
 }
 
 void RopeTextBuffer::moveCursorLeft()
 {
     // TODO TASK 2
+    if (cursorPos <= 0)
+        throw std::out_of_range("Cursor is out of range!");
+
+    int before = cursorPos;
+    cursorPos--;
+
+    HistoryManager::Action a;
+    a.actionName = "move";
+    a.cursorBefore = before;
+    a.cursorAfter  = cursorPos;
+    a.data = "L";
+    history->addAction(a);
 }
 
 void RopeTextBuffer::moveCursorRight()
 {
     // TODO TASK 2
+    if (cursorPos >= rope.length())
+        throw std::out_of_range("Cursor is out of range!");
+
+    int before = cursorPos;
+    cursorPos++;
+
+    HistoryManager::Action a;
+    a.actionName = "move";
+    a.cursorBefore = before;
+    a.cursorAfter  = cursorPos;
+    a.data = "R";
+    history->addAction(a);
 }
 
 int RopeTextBuffer::getCursorPos() const
 {
     // TODO TASK 2
+    return cursorPos;
 }
 
 string RopeTextBuffer::getContent() const
 {
     // TODO TASK 2
+    return rope.toString();
 }
 
 int RopeTextBuffer::findFirst(char c) const
 {
     // TODO TASK 2
+    string s = rope.toString();
+    size_t pos = s.find(c);
+    if (pos == string::npos) return -1;
+    return static_cast<int>(pos);
 }
 
 int *RopeTextBuffer::findAll(char c) const
 {
-    // TODO TASK 2
+    // Lấy nội dung chuỗi
+    string s = rope.toString();
+    int len = static_cast<int>(s.size());
+
+    // Đếm số lần xuất hiện
+    int count = 0;
+    for (int i = 0; i < len; ++i) {
+        if (s[i] == c) count++;
+    }
+    if (count == 0) return nullptr;
+
+    // Cấp phát mảng động (thêm 1 ô để sentinel -1)
+    int *arr = new int[count + 1];
+    int idx = 0;
+
+    // Ghi lại vị trí các ký tự
+    for (int i = 0; i < len; ++i) {
+        if (s[i] == c) {
+            arr[idx++] = i;
+        }
+    }
+
+    // Sentinel để báo kết thúc
+    arr[count] = -1;
+    return arr;
 }
 
-void RopeTextBuffer::undo()
-{
-    if (!history->canUndo())
-        return;
-    history->undo();
-}
-
-void RopeTextBuffer::redo()
-{
-    if (!history->canRedo())
-        return;
-    history->redo();
-}
-
-void RopeTextBuffer::printHistory() const
-{
-    history->printHistory();
-}
 
 void RopeTextBuffer::clear()
 {
     // TODO TASK 2
+    rope = Rope();     // làm rỗng nội dung
+    cursorPos = 0;     // đưa con trỏ về đầu
+
+    // reset toàn bộ lịch sử (đơn giản nhất: tạo mới)
+    delete history;
+    history = new HistoryManager();
 }
 
 // ==================== HistoryManager ====================
-HistoryManager::HistoryManager() : currentIndex(0) {}
-
-HistoryManager::~HistoryManager() {}
-
-void HistoryManager::addAction(const Action &a)
-{
-    // TODO TASK 1
-}
 
 bool HistoryManager::canUndo() const
 {
     // TODO TASK 2
+    return currentIndex > 0;
 }
 
 bool HistoryManager::canRedo() const
 {
     // TODO TASK 2
-}
-
-void HistoryManager::undo()
-{
-    if (canUndo())
-        --currentIndex;
-}
-
-void HistoryManager::redo()
-{
-    if (canRedo())
-        ++currentIndex;
+    return currentIndex < actions.size();
 }
 
 void HistoryManager::printHistory() const
 {
     // TODO TASK 2
+    // In theo định dạng: [(actionName, cursorBefore, cursorAfter, data), ...]
+    cout << "[";
+    for (int i = 0; i < actions.size(); ++i) {
+        const Action &a = actions.get(i);
+        if (i > 0) cout << ", ";
+        cout << "("
+             << a.actionName << ", "
+             << a.cursorBefore << ", "
+             << a.cursorAfter << ", "
+             << a.data
+             << ")";
+    }
+    cout << "]" << endl;
 }
+
