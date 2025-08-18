@@ -47,8 +47,7 @@ public:
     public:
         Iterator(Node *node) : current(node) {}
 
-        Iterator() : node(nullptr) {}               
-        Iterator(Node* p) : node(p) {}
+        Iterator() : current(nullptr) {}               
 
         T &operator*() const
         {

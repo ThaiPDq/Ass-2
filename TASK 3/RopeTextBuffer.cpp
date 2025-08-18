@@ -11,7 +11,9 @@ DoublyLinkedList<T>::DoublyLinkedList() : length(0)
     head = new Node(); // dummy head
     tail = new Node(); // dummy tail
     head->next = tail;
+    head->prev = nullptr;
     tail->prev = head;
+    tail->next = nullptr;
 }
 
 template <typename T>
@@ -43,13 +45,15 @@ void DoublyLinkedList<T>::insertAtHead(T data) {
 
 template <typename T>
 void DoublyLinkedList<T>::insertAtTail(T data) {
-    Node* newNode = new Node(data, tail, nullptr);
-    if (tail != nullptr) {
-        tail->next = newNode;
-    } else {
-        head = newNode;
+    Node* newNode = new Node(data, tail->prev, tail); // between last and tail
+    tail->prev->next = newNode; // link old last to newNode
+    tail->prev = newNode;       // link tail back to newNode
+    Node* tmp = head;
+    while (tmp != nullptr) {
+        cout << tmp << " ";
+        tmp = tmp->next;
     }
-    tail = newNode;
+    cout << endl;
     length++;
 }
 
@@ -679,7 +683,7 @@ void RopeTextBuffer::clear()
 
 HistoryManager::HistoryManager() {
     currentIndex = 0;
-    current = actions.end();  // iterator trỏ tới tail (list rỗng thì head->next = tail)
+    current = actions.begin();  // iterator trỏ tới tail (list rỗng thì head->next = tail)
 }
 
 
@@ -689,33 +693,35 @@ HistoryManager::~HistoryManager() {
 
 void HistoryManager::addAction(const Action &a) {
 
-    auto it = actions.begin();
-    while (it != actions.end() && it != current) {
-        ++it;
-    }
+    //auto it = actions.begin();
+    //while (it != actions.end() && it != current) {
+    //    ++it;
+    //}
 
-    while (it != actions.end()) {
-        actions.deleteAt(actions.size() - 1); 
+    //while (it != actions.end()) {
+    //    actions.deleteat(actions.size() - 1); 
 
-        it = actions.end();
-    }
+    //    it = actions.end();
+    //}
 
     actions.insertAtTail(a);
+    cout << actions.begin()->data << " " << current->data;
 
-    current = --actions.end();   
+    current = --actions.end();
 }
 
 
 
 
 bool HistoryManager::canUndo() const {
+    auto it = current;
+    ++it;
     return current != actions.begin();
 }
 
 bool HistoryManager::canRedo() const {
     auto it = current;
-    ++it; 
-    return it != actions.end();
+    return it != actions.end() && it != --actions.end();
 }
 
 // void HistoryManager::printHistory() const
@@ -737,26 +743,39 @@ bool HistoryManager::canRedo() const {
 void HistoryManager::printHistory() const {
     cout << "[";
     bool first = true;
-    auto it_temp = actions.begin();  
-if (it_temp != actions.end()) {  
-    cout << (*it_temp).data << endl;  
-}
 
-    for (auto it = actions.begin(); it != actions.end(); ++it) {
+    //for (auto it = actions.begin(); it != current; ++it) {
+    //    if (!first) cout << ", ";
+    //    const Action &a = *it;
+    //    cout << "("
+    //         << a.actionName << ", "
+    //         << a.cursorBefore << ", "
+    //         << a.cursorAfter << ", "
+    //         << a.data << ")";
+    //    first = false;
+    //}
+    auto it = actions.begin();
+    while (it != actions.end()) {
         if (!first) cout << ", ";
-        const Action &a = *it;
+        const Action& a = *it;
+
         cout << "("
-             << a.actionName << ", "
-             << a.cursorBefore << ", "
-             << a.cursorAfter << ", "
-             << a.data << ")";
+            << a.actionName << ", "
+            << a.cursorBefore << ", "
+            << a.cursorAfter << ", "
+            << a.data << ")";
+
         first = false;
+
+        if (it == current) break;  // stop after printing current
+        ++it;
     }
-    cout << "]" << endl;
+    cout << "]";
 }
 
 
-void RopeTextBuffer::undo() {}
+void RopeTextBuffer::undo() {
+}
 
 void RopeTextBuffer::redo() {}
 
