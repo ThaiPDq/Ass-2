@@ -66,13 +66,16 @@ public:
     int length() const;
     bool empty() const;
     char charAt(int index) const;
-    string substring(int start, int length) const;
+    string substring(int start, int length) const; 
     void insert(int index, const string &s);
     void deleteRange(int start, int length);
     string toString() const;
 
     friend class TestHelper;
 };
+
+string Rope::substringHelper(Node *node, int start, int end) const{};
+
 
 // class RopeTextBuffer {
 // public:

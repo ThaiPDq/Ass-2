@@ -9,7 +9,7 @@ void TestHelper::test_history()
         std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
         hm.printHistory();
         std::cout.rdbuf(old);
-        EXPECT_EQ(buffer.str(), "[]");
+        EXPECT_EQ(buffer.str(), "[]"); cout<<"1";
     }
 
     hm.addAction({"insert", 0, 1, "A"});
@@ -28,7 +28,7 @@ void TestHelper::test_history()
 
         std::string expected = "[(insert, 0, 1, A), (delete, 1, 1, B), (move, 1, 0, L), (move, 0, 1, R), (insert, 0, 1, A), (move, 1, 5, J), (replace, 5, 10, old_string)]";
 
-        EXPECT_EQ(buffer.str(), expected);
+        EXPECT_EQ(buffer.str(), expected); cout<<"2";
     }
 }
 

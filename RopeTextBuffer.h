@@ -79,37 +79,152 @@ public:
 
 int max(int a, int b);
 
-class RopeTextBuffer {
-public:
-    class HistoryManager; 
+template <typename T>
+class DoublyLinkedList
+{
+private:
+    struct Node
+    {
+        T data;
+        Node *prev;
+        Node *next;
+        Node() : prev(nullptr), next(nullptr) {}
+        Node(const T &val, Node *prev = nullptr, Node *next = nullptr) : data(val), prev(prev), next(next) {}
+    };
 
+    Node *head; // Dummy head
+    Node *tail; // Dummy tail
+    int length;
+
+public:
+    DoublyLinkedList();
+    ~DoublyLinkedList();
+
+    void insertAtHead(T data);
+    void insertAtTail(T data);
+    void insertAt(int index, T data);
+    void deleteAt(int index);
+    T &get(int index) const;
+    int indexOf(T item) const;
+    bool contains(T item) const;
+    int size() const;
+    void reverse();
+    string toString(string (*convert2str)(T &) = nullptr) const;
+
+    class Iterator
+    {
+    private:
+        Node *current;
+
+    public:
+        Iterator(Node *node) : current(node) {}
+
+        T &operator*() const
+        {
+            return current->data;
+        }
+
+        Iterator &operator++()
+        {
+            current = current->next;
+            return *this;
+        }
+
+        Iterator &operator--()
+        {
+            current = current->prev;
+            return *this;
+        }
+
+        bool operator==(const Iterator &other) const
+        {
+            return current == other.current;
+        }
+
+        bool operator!=(const Iterator &other) const
+        {
+            return current != other.current;
+        }
+    };
+
+    Iterator begin() const
+    {
+        return Iterator(head->next);
+    }
+
+    Iterator end() const
+    {
+        return Iterator(tail);
+    }
+};
+
+class RopeTextBuffer
+{
 private:
     Rope rope;
     int cursorPos;
-    HistoryManager* history;
+    HistoryManager *history;
 
 public:
     RopeTextBuffer();
     ~RopeTextBuffer();
 
-    void insert(const string& s);
+    void insert(const string &s);
     void deleteRange(int length);
-    void replace(int length, const string& s);
+    void replace(int length, const string &s);
     void moveCursorTo(int index);
     void moveCursorLeft();
     void moveCursorRight();
-    int  getCursorPos() const;
+    int getCursorPos() const;
     string getContent() const;
     int findFirst(char c) const;
-    int* findAll(char c) const;
+    int *findAll(char c) const;
     void undo();
     void redo();
     void printHistory() const;
-#ifdef TESTING
+    void clear();
     friend class TestHelper;
-#endif
 };
 
+class HistoryManager
+{
+public:
+    struct Action
+    {
+        string actionName;
+        int cursorBefore;
+        int cursorAfter;
+        string data;
+        string data_replace = "";
+    };
+
+    // TODO: may provide some attributes
+    DoublyLinkedList<Action> actions;
+    int currentIndex;
+
+public:
+    HistoryManager();
+    ~HistoryManager();
+    void addAction(const Action &a);
+    bool canUndo() const;
+    bool canRedo() const;
+    void printHistory() const;
+
+    Action getUndo()
+    {
+        currentIndex--;
+        return actions.get(currentIndex);
+    }
+
+    Action getRedo()
+    {
+        Action a = actions.get(currentIndex);
+        currentIndex++;
+        return a;
+    }
+
+    friend class TestHelper;
+};
 
 class RopeTextBuffer::HistoryManager {
 public:

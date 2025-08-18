@@ -47,6 +47,9 @@ public:
     public:
         Iterator(Node *node) : current(node) {}
 
+        Iterator() : node(nullptr) {}               
+        Iterator(Node* p) : node(p) {}
+
         T &operator*() const
         {
             return current->data;
@@ -62,6 +65,10 @@ public:
         {
             current = current->prev;
             return *this;
+        }
+
+        T* operator->() const {           // thêm để truy cập trực tiếp
+        return &(current->data);
         }
 
         bool operator==(const Iterator &other) const
@@ -167,6 +174,9 @@ public:
     // TODO: may provide some attributes
     DoublyLinkedList<Action> actions;
     int currentIndex;
+    // Action *current;
+    DoublyLinkedList<Action>::Iterator current;
+
 
 public:
     HistoryManager();

@@ -176,6 +176,7 @@ public:
     void undo();
     void redo();
     void printHistory() const;
+
     friend class TestHelper;
 };
 
